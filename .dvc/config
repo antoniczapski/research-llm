@@ -1,0 +1,4 @@
+[core]
+    remote = my-local-remote
+['remote "my-local-remote"']
+    url = C:\Users\user\Studia\DataScience\Research\research-llm-data
