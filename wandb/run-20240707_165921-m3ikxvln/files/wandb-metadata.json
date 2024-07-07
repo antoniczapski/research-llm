@@ -1,0 +1,53 @@
+{
+    "os": "Windows-10-10.0.19045-SP0",
+    "python": "3.11.9",
+    "heartbeatAt": "2024-07-07T14:59:24.574555",
+    "startedAt": "2024-07-07T14:59:21.495158",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\user\\Studia\\DataScience\\Research\\research-llm\\wandb\\init.py",
+    "codePathLocal": "wandb\\init.py",
+    "codePath": "wandb\\init.py",
+    "git": {
+        "remote": "git@github.com:antoniczapski/research-llm.git",
+        "commit": "4cafe40bba4a2e0e45feb7a565d4bc0fa640d7fa"
+    },
+    "email": "antoni.krzysztof.czapski@gmail.com",
+    "root": "C:/Users/user/Studia/DataScience/Research/research-llm",
+    "host": "MSI",
+    "username": "user",
+    "executable": "C:\\ProgramData\\Anaconda3\\envs\\research-llm\\python.exe",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 1200.0,
+        "min": 0.0,
+        "max": 2601.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1200.0,
+            "min": 0.0,
+            "max": 2601.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 809.7792930603027,
+            "used": 672.4688682556152
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2060",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 31.84520721435547
+    }
+}
