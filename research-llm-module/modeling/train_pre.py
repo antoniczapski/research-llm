@@ -18,7 +18,6 @@ $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=1 --master_addr=123.456.123
 
 import os
 import time
-
 import math
 import pickle
 from contextlib import nullcontext
@@ -29,38 +28,26 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 
 from model import GPTConfig, GPT
-from tqdm import tqdm
 
-start_run_time = time.time()
-
-# create csv file for logging
-with open(f"logs/gpt-2-none.csv", "w") as f:
-    f.write("iter_num,lossf,time,running_mfu\n")
-
-config_file = os.path.join(os.getcwd(), "config", "train_gpt2_fineweb_none.py")
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
-out_dir = 'out'
-eval_interval = 50
+out_dir = os.path.join(os.getcwd(),'research-llm' ,'models', 'pre')
+eval_interval = 500
 log_interval = 1
 eval_iters = 200
 eval_only = False # if True, script exits right after the first eval
-always_save_checkpoint = False # if True, always save a checkpoint after each eval
+always_save_checkpoint = True # if True, always save a checkpoint after each eval
 init_from = 'scratch' # 'scratch' or 'resume' or 'gpt2*'
 # wandb logging
-wandb_log = False # disabled by default
-wandb_project = 'owt'
-wandb_run_name = 'gpt2' # 'run' + str(time.time())
+wandb_log = True # disabled by default
+wandb_entity = 'uwr-projects-general'
+wandb_project = 'research-llm'
+wandb_run_name = 'gpt2-pre-' + str(time.time()) # 'run' + str(time.time())
 # data
 dataset = 'fineweb_pre'
-
-# data_dir = os.path.join('data', dataset)
-# meta_path = os.path.join(data_dir, 'meta.pkl')
-# print(os.path.exists(meta_path))
-
 gradient_accumulation_steps = 5 * 8 # used to simulate larger batch sizes
-batch_size = 12 # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 6 # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
 # model
 n_layer = 12
@@ -83,19 +70,12 @@ min_lr = 6e-5 # minimum learning rate, should be ~= learning_rate/10 per Chinchi
 # DDP settings
 backend = 'nccl' # 'nccl', 'gloo', etc.
 # system
-device = 'cuda' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
+device = 'cuda:0' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
 dtype = 'bfloat16' if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else 'float16' # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
 compile = False # use PyTorch 2.0 to compile the model to be faster
 # -----------------------------------------------------------------------------
 config_keys = [k for k,v in globals().items() if not k.startswith('_') and isinstance(v, (int, float, bool, str))]
-exec(open(config_file).read())
-
-# out_dir = out_dir + "_20k" # added artificially
-# max_iters = 20000 # added artificially
-# lr_decay_iters = 20000 # added artificially
-
-
-# !!!!!!!!!!!! exec(open('configurator.py').read()) # overrides from command line or config file
+exec(open(os.path.join(os.getcwd(),'research-llm','research-llm-module','modeling','configurator.py')).read()) # overrides from command line or config file
 config = {k: globals()[k] for k in config_keys} # will be useful for logging
 # -----------------------------------------------------------------------------
 
@@ -133,14 +113,14 @@ ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torc
 ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
 
 # poor man's data loader
-data_dir = os.path.join('data', 'processed', dataset)
+data_dir = os.path.join(os.getcwd(),'research-llm','data', 'processed', dataset)
 def get_batch(split):
     # We recreate np.memmap every batch to avoid a memory leak, as per
     # https://stackoverflow.com/questions/45132940/numpy-memmap-memory-usage-want-to-iterate-once/61472122#61472122
     if split == 'train':
         data = np.memmap(os.path.join(data_dir, 'train.bin'), dtype=np.uint16, mode='r')
     else:
-        data = np.memmap(os.path.join(data_dir, 'test.bin'), dtype=np.uint16, mode='r')
+        data = np.memmap(os.path.join(data_dir, 'val.bin'), dtype=np.uint16, mode='r')
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([torch.from_numpy((data[i:i+block_size]).astype(np.int64)) for i in ix])
     y = torch.stack([torch.from_numpy((data[i+1:i+1+block_size]).astype(np.int64)) for i in ix])
@@ -166,14 +146,14 @@ if os.path.exists(meta_path):
 
 # model init
 model_args = dict(n_layer=n_layer, n_head=n_head, n_embd=n_embd, block_size=block_size,
-                bias=bias, vocab_size=None, dropout=dropout) # start with model_args from command line
+                  bias=bias, vocab_size=None, dropout=dropout) # start with model_args from command line
 if init_from == 'scratch':
     # init a new model from scratch
     print("Initializing a new model from scratch")
     # determine the vocab size we'll use for from-scratch training
     if meta_vocab_size is None:
         print("defaulting to vocab_size of GPT-2 to 50304 (50257 rounded up for efficiency)")
-    model_args['vocab_size'] = meta_vocab_size if meta_vocab_size is not None else 30000
+    model_args['vocab_size'] = meta_vocab_size if meta_vocab_size is not None else 50304
     gptconf = GPTConfig(**model_args)
     model = GPT(gptconf)
 elif init_from == 'resume':
@@ -265,7 +245,7 @@ def get_lr(it):
 # logging
 if wandb_log and master_process:
     import wandb
-    wandb.init(project=wandb_project, name=wandb_run_name, config=config)
+    wandb.init(entity=wandb_entity,project=wandb_project, name=wandb_run_name, config=config)
 
 # training loop
 X, Y = get_batch('train') # fetch the very first batch
@@ -303,8 +283,8 @@ while True:
                     'best_val_loss': best_val_loss,
                     'config': config,
                 }
-        print(f"saving checkpoint to {out_dir}")
-        torch.save(checkpoint, os.path.join(out_dir, 'ckpt.pt'))
+                print(f"saving checkpoint to {out_dir}")
+                torch.save(checkpoint, os.path.join(out_dir, f'ckpt_{iter_num}.pt'))
     if iter_num == 0 and eval_only:
         break
 
@@ -346,9 +326,6 @@ while True:
             mfu = raw_model.estimate_mfu(batch_size * gradient_accumulation_steps, dt)
             running_mfu = mfu if running_mfu == -1.0 else 0.9*running_mfu + 0.1*mfu
         print(f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms, mfu {running_mfu*100:.2f}%")
-        # append this to csv file with logs
-        with open(os.path.join(os.getcwd(),"logs","gpt-2-none.csv"), "a") as f:
-            f.write(f"{iter_num},{lossf},{dt},{running_mfu}\n")
     iter_num += 1
     local_iter_num += 1
 
@@ -358,8 +335,6 @@ while True:
 
 if ddp:
     destroy_process_group()
-
-
-end_run_time = time.time()
-print(f"Total run time: {end_run_time - start_run_time:.2f} seconds")
-print(f"Total run time: {(end_run_time - start_run_time) / 60:.2f} minutes")
+    
+if wandb_log and master_process:
+    wandb.finish()
