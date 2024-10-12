@@ -25,4 +25,4 @@ def gpu_stress_test(device_id=1, matrix_size=1024, duration_seconds=60):
     print(f'Completed {operations} matrix multiplications in {duration_seconds} seconds.')
 
 # Call the function to test GPU 1 for 1 minute
-gpu_stress_test(device_id=1, matrix_size=1024, duration_seconds=60)
+gpu_stress_test(device_id=1, matrix_size=1024, duration_seconds=20)

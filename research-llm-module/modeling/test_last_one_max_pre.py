@@ -19,7 +19,7 @@ data_dir = os.path.join(os.getcwd(),'data', 'processed', 'fineweb_pre')
 out_dir = os.path.join(os.getcwd(),'reports','pre')
 
 # create results csv file
-with open(os.path.join(out_dir,"results_one_max_pre.csv"), "w") as file:
+with open(os.path.join(out_dir,"results_last_one_max_pre.csv"), "w") as file:
     file.write("training iterations,perplexity,perplexity POS\n")
 
 for name in tqdm(names):
@@ -33,7 +33,7 @@ for name in tqdm(names):
         torch.cuda.manual_seed(seed)
         torch.backends.cuda.matmul.allow_tf32 = True # allow tf32 on matmul
         torch.backends.cudnn.allow_tf32 = True # allow tf32 on cudnn
-        device = 'cuda:1' # for later use in torch.autocast
+        device = 'cuda:0' # for later use in torch.autocast
         ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torch.float16}[dtype]
 
 
@@ -79,7 +79,8 @@ for name in tqdm(names):
                 # for i in range(len(data) - 255 - 1):
                     true_next = data[i+255]
 
-                    # context = data[i:i+255]
+                    if itos[true_next][0] == "[" and itos[true_next][-1] == "]":
+                        context = data[i:i+255]
 
                     # context_string = decode(context)
                     # x = (torch.tensor(context, dtype=torch.long, device=device)[None, ...])
@@ -124,7 +125,7 @@ for name in tqdm(names):
         print(f"Perplexity POS: {perplexity_POS.item()}")
         
         # append results to csv file
-        with open(os.path.join(out_dir,"results_one_max_pre.csv"), "a") as file:
+        with open(os.path.join(out_dir,"results_last_one_max_pre.csv"), "a") as file:
             file.write(f"{iter},{perplexity.item()},{perplexity_POS.item()}\n")
     except Exception as e:
         print(f"Error: {e}")

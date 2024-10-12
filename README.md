@@ -60,3 +60,25 @@ Research about new ways of training language models. Introducing intermediate ge
 
 --------
 
+## Running on remote
+
+### Start a new screen session
+screen -S training_cuda_0
+
+### Detach from the screen session (Press Ctrl + A, then D)
+Ctrl + A, D
+
+### Reconnect to an existing screen session
+screen -r training_cuda_0
+
+### List all active screen sessions
+screen -ls
+
+### Reconnect to a screen session using its ID
+screen -r session_id
+
+### Close a screen session (when inside the session)
+exit
+
+### GPU usage monitoring
+watch -n 1 nvidia-smi
