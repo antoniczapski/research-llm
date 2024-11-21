@@ -7,7 +7,6 @@ pip
 python-dotenv
 tqdm
 typer
--e .
 
 # added
 wandb

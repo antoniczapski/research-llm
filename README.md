@@ -4,12 +4,12 @@
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-Research about new ways of training language models. Introducing intermediate generation tokens (notes) as a way of increasing compute per answer.
+Research about new ways of training language models. Introducing intermediate generation tokens (notes) as a way of increasing time the model spends on deducing the answer.
 
 ## Project Organization
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
+├── LICENSE            <- Open-source license
 ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
 ├── README.md          <- The top-level README for developers using this project.
 ├── data
@@ -58,6 +58,57 @@ Research about new ways of training language models. Introducing intermediate ge
         └── visualize.py
 ```
 
+## Experiment 1
+
+**Hypothesis 1:** Large language model trained on corpus with notes models the language better.
+
+**Hypothesis 2:** In comparison, language model trained on corpus with POS tag notes achieves better perplexity when it predicts POS tag prior to word generation rather than post word. 
+
+### Dataset, model architecture & training
+
+**TODO (21.11.2024):** Add corpus specyfication - which one, how many GB / tokens, encoding info, which tagger was used
+
+There were two separate datasets. Fitst, smaller, for initial tests - collection Shakespeare writings. Second, larger, for large scale experiment - fineweb.
+
+Transformer with ~100M parameters was chosen as a model architecture.
+
+Each model was trained on a single NVIDIA GeForce RTX 3080, 10018 MiB. A single model training session took up to 20h
+
+All of the files related to that experiment are stored in `pre_post_experiment` files.
+
+### Design
+Experiment was design to compare perplexity of four different types of corpus augmentation:
+
+a) pre notes - model was deducing first POS tag and only then the actual word
+
+`['[RB]', 'Bright', 'ly', '[VBG]', 'jumping', '[NNS]', 'jelly', 'beans', '[VBD]', 'became', '[JJ]', 'jubilant', '[.]', '.']`
+
+b) post notes - model was generating word tokens then giving the POS tag that caracterized them
+
+`['Bright', 'ly', '[RB]', 'jumping', '[VBG]', 'jelly', 'beans', '[NNS]', 'became', '[VBD]', 'jubilant', '[JJ]', '.', '[.]']`
+
+c) blank notes - as a reference the model was trained on the corpus with blank notes
+
+`['Bright', 'ly', '[BLANK]', 'jumping', '[BLANK]', 'jelly', 'beans', '[BLANK]', 'became', '[BLANK]', 'jubilant', '[BLANK]', '.', '[BLANK]']`
+
+c) none notes - for the comparison the test were also made with a regular corpus, without any notes; note that this makes the model context window up to two times larger
+
+`['Bright', 'ly', 'jumping', 'jelly', 'beans', 'became', 'jubilant', '.']`
+
+
+## Experiment 2
+
+**Hypothesis 1:** Amount of information provided in post-notes positively correlates with the model ability to predict natural language.
+
+### Design
+
+- Use Polish language as its syntax and morphology are richer than English
+
+
+### TODO
+
+- create different tagging procedures for Polish language - make a POC notebook
+
 --------
 
 ## Running on remote
@@ -82,15 +133,3 @@ exit
 
 ### GPU usage monitoring
 watch -n 1 nvidia-smi
-
-
-------------------------------------------------------------------------------
-
-/pio/scratch/1/i317214/miniconda/envs/research-llm-env/bin/python /pio/scratch/1/i317214/research-llm/research-llm-module/modeling/train_none.py
-
-screen -S training_cuda_0_13_11
-screen -S training_cuda_1_13_11
-
-
-screen -r training_cuda_0_13_11
-screen -r training_cuda_1_13_11
