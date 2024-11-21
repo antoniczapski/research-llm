@@ -74,7 +74,7 @@ for name in tqdm(names):
         with torch.no_grad():
             with torch.amp.autocast(device_type=device, dtype=ptdtype):            
                 # iterate over 255 long sliding window on the data
-                for i in tqdm(range(2000)):
+                for i in tqdm(range(1900)):
                 # for i in tqdm(range(len(data) - 255 - 1)):
                     true_next = data[i+255]
 

@@ -23,7 +23,7 @@ out_dir = os.path.join(os.getcwd(),'reports','blank')
 with open(os.path.join(out_dir,"results_ground_blank.csv"), "w") as file:
     file.write("training iterations,perplexity,perplexity POS\n")
 
-
+print(f"Names: {repr(names)}")
 for name in tqdm(names):
     try:
         iter = int(name.split("_")[1].split(".")[0])

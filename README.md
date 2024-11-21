@@ -82,3 +82,15 @@ exit
 
 ### GPU usage monitoring
 watch -n 1 nvidia-smi
+
+
+------------------------------------------------------------------------------
+
+/pio/scratch/1/i317214/miniconda/envs/research-llm-env/bin/python /pio/scratch/1/i317214/research-llm/research-llm-module/modeling/train_none.py
+
+screen -S training_cuda_0_13_11
+screen -S training_cuda_1_13_11
+
+
+screen -r training_cuda_0_13_11
+screen -r training_cuda_1_13_11
