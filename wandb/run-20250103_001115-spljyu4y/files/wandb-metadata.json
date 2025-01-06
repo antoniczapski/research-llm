@@ -1,0 +1,53 @@
+{
+    "os": "Windows-10-10.0.19045-SP0",
+    "python": "3.11.9",
+    "heartbeatAt": "2025-01-02T23:11:16.581989",
+    "startedAt": "2025-01-02T23:11:15.749811",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\user\\Studia\\DataScience\\Research\\research-llm\\module_experiment_2\\train_post.py",
+    "codePathLocal": "module_experiment_2\\train_post.py",
+    "codePath": "module_experiment_2\\train_post.py",
+    "git": {
+        "remote": "git@github.com:antoniczapski/research-llm.git",
+        "commit": "024820c6936b55377a6d3ded2e58c1ae4145aa4e"
+    },
+    "email": "antoni.krzysztof.czapski@gmail.com",
+    "root": "C:/Users/user/Studia/DataScience/Research/research-llm",
+    "host": "MSI",
+    "username": "user",
+    "executable": "C:\\ProgramData\\Anaconda3\\envs\\research-llm\\python.exe",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2601.0,
+        "min": 0.0,
+        "max": 2601.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2601.0,
+            "min": 0.0,
+            "max": 2601.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 809.7792930603027,
+            "used": 729.7935600280762
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2060",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 31.843082427978516
+    }
+}
