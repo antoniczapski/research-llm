@@ -3,7 +3,7 @@ import os
 import glob
 import random
 import numpy as np
-import spacy
+import spacy as sp
 from transformers import AutoTokenizer
 from tqdm import tqdm
 
@@ -17,7 +17,7 @@ from tqdm import tqdm
 # Make sure you've installed:
 #   pip install spacy==3.5.3
 #   python -m spacy download pl_core_news_sm
-nlp = spacy.load("pl_core_news_sm")
+nlp = sp.load("pl_core_news_sm")
 
 
 ###############################################################################
@@ -140,15 +140,18 @@ def process_corpus_line_by_line():
     Saves both .txt and .bin (tokenized) output for train/val.
     """
     # Hard-coded path and config
-    corpus_path = os.path.join("data","raw","pl")  # do not take from STDIN
-    out_prefix = os.path.join("data","preprocessed","pl","pl_corpus")
+    # corpus_path = os.path.join("data","raw","pl")  # do not take from STDIN
+    # out_prefix = os.path.join("data","preprocessed","pl","pl_corpus")
+    corpus_path = os.path.join("module_experiment_2","lalka_prus.txt")
+    out_prefix = os.path.join("module_experiment_2","lalka_prus")
+    
     val_ratio = 0.1
     seed = 2357
 
     random.seed(seed)  # for reproducible line-level split
 
     # Collect all .txt paths
-    txt_files = glob.glob(os.path.join(corpus_path, "*.txt"))
+    txt_files = [corpus_path]
     if not txt_files:
         raise ValueError(f"No .txt files found in {corpus_path}.")
 
@@ -178,12 +181,12 @@ def process_corpus_line_by_line():
         for file_path in txt_files:
             with open(file_path, "r", encoding="utf-8") as f:
                 # count line and set up tqdm
-                lines = sum(1 for line in f)
+                lines = sum(1 for _ in f)
                 f.seek(0)
                 f = tqdm(f, total=lines, desc=f"Processing {file_path}", unit="lines")
                 for line in f:
                     line = line.strip()
-                    if not line or len(line) > 500:
+                    if not line:
                         continue
 
                     total_lines += 1
@@ -197,10 +200,10 @@ def process_corpus_line_by_line():
                     processed_line = inject_pos_as_rare_char(line)
 
                     # 2) Write processed_line to the correct .txt
-                    # if is_val:
-                    #     val_txt_f.write(processed_line + "\n")
-                    # else:
-                    #     train_txt_f.write(processed_line + "\n")
+                    if is_val:
+                        val_txt_f.write(processed_line + "\n")
+                    else:
+                        train_txt_f.write(processed_line + "\n")
 
                     # 3) Tokenize
                     enc_ids = tokenizer.encode(processed_line, add_special_tokens=False)
@@ -253,6 +256,6 @@ def toy_test():
 ###############################################################################
 if __name__ == "__main__":
     # If you want, you can just call toy_test() here for debugging
-    toy_test()
+    # toy_test()
 
-    # process_corpus_line_by_line()
+    process_corpus_line_by_line()

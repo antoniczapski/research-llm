@@ -45,7 +45,7 @@ wandb_entity = 'uwr-projects-general'
 wandb_project = 'research-llm'
 wandb_run_name = 'gpt2-post-' + str(time.time()) # 'run' + str(time.time())
 # data
-dataset = 'fineweb_post'
+dataset = 'lalka_prus'
 gradient_accumulation_steps = 5 * 8 # used to simulate larger batch sizes
 batch_size = 6 # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
@@ -108,19 +108,20 @@ torch.manual_seed(1337 + seed_offset)
 torch.backends.cuda.matmul.allow_tf32 = True # allow tf32 on matmul
 torch.backends.cudnn.allow_tf32 = True # allow tf32 on cudnn
 device_type = 'cuda' if 'cuda' in device else 'cpu' # for later use in torch.autocast
+print(f"using device {device} with {'ddp' if ddp else 'no ddp'}")
 # note: float16 data type will automatically use a GradScaler
 ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torch.float16}[dtype]
 ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
 
 # poor man's data loader
-data_dir = os.path.join(os.getcwd(),'data', 'preprocessed', 'pl')
+data_dir = os.path.join(os.getcwd(),'module_experiment_2')
 def get_batch(split):
     # We recreate np.memmap every batch to avoid a memory leak, as per
     # https://stackoverflow.com/questions/45132940/numpy-memmap-memory-usage-want-to-iterate-once/61472122#61472122
     if split == 'train':
-        data = np.memmap(os.path.join(data_dir, 'train.bin'), dtype=np.uint16, mode='r')
+        data = np.memmap(os.path.join(data_dir, f'{dataset}_train.bin'), dtype=np.uint16, mode='r')
     else:
-        data = np.memmap(os.path.join(data_dir, 'val.bin'), dtype=np.uint16, mode='r')
+        data = np.memmap(os.path.join(data_dir, f'{dataset}_val.bin'), dtype=np.uint16, mode='r')
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([torch.from_numpy((data[i:i+block_size]).astype(np.int64)) for i in ix])
     y = torch.stack([torch.from_numpy((data[i+1:i+1+block_size]).astype(np.int64)) for i in ix])
