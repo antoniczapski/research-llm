@@ -57,7 +57,7 @@ dropout = 0.0 # for pretraining 0 is good, for finetuning try 0.1+
 bias = False # do we use bias inside LayerNorm and Linear layers?
 # adamw optimizer
 learning_rate = 6e-4 # max learning rate
-max_iters = 600000 # total number of training iterations
+max_iters = 5000 # total number of training iterations
 weight_decay = 1e-1
 beta1 = 0.9
 beta2 = 0.95
@@ -111,7 +111,8 @@ device_type = 'cuda:0' # for later use in torch.autocast
 print(f"using device {device} with {'ddp' if ddp else 'no ddp'}")
 # note: float16 data type will automatically use a GradScaler
 ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torch.float16}[dtype]
-ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
+# ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
+ctx = torch.amp.autocast(device_type='cuda', dtype=ptdtype)
 
 # poor man's data loader
 data_dir = os.path.join(os.getcwd(),'module_experiment_2')
@@ -289,9 +290,9 @@ while True:
                     'config': config,
                 }
                 print(f"saving checkpoint to {out_dir}")
-                torch.save(checkpoint, os.path.join(out_dir, f'ckpt_{iter_num}.pt'))
+                torch.save(checkpoint, os.path.join(out_dir, f'ckpt_{dataset}_{iter_num}.pt'))
             # save logs to txt
-            with open(os.path.join(out_dir, 'log.txt'), 'a') as f:
+            with open(os.path.join(out_dir, f'log_{dataset}.txt'), 'a') as f:
                 f.write(f"{iter_num} {losses['train']} {losses['val']} {lr}\n")
     if iter_num == 0 and eval_only:
         break
