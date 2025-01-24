@@ -1,0 +1,140 @@
+wandb_version: 1
+
+out_dir:
+  desc: null
+  value: /pio/scratch/1/i317214/research-llm/models/pl_v2
+eval_interval:
+  desc: null
+  value: 500
+log_interval:
+  desc: null
+  value: 1
+eval_iters:
+  desc: null
+  value: 200
+eval_only:
+  desc: null
+  value: false
+always_save_checkpoint:
+  desc: null
+  value: true
+init_from:
+  desc: null
+  value: scratch
+wandb_log:
+  desc: null
+  value: true
+wandb_entity:
+  desc: null
+  value: uwr-projects-general
+wandb_project:
+  desc: null
+  value: research-llm
+wandb_run_name:
+  desc: null
+  value: gpt2-post-1737675725.3014617
+dataset:
+  desc: null
+  value: lalka_prus_normal
+gradient_accumulation_steps:
+  desc: null
+  value: 40
+batch_size:
+  desc: null
+  value: 6
+block_size:
+  desc: null
+  value: 1024
+n_layer:
+  desc: null
+  value: 12
+n_head:
+  desc: null
+  value: 12
+n_embd:
+  desc: null
+  value: 768
+dropout:
+  desc: null
+  value: 0.1
+bias:
+  desc: null
+  value: false
+learning_rate:
+  desc: null
+  value: 0.0003
+max_iters:
+  desc: null
+  value: 5000
+weight_decay:
+  desc: null
+  value: 0.01
+beta1:
+  desc: null
+  value: 0.9
+beta2:
+  desc: null
+  value: 0.95
+grad_clip:
+  desc: null
+  value: 1.0
+decay_lr:
+  desc: null
+  value: true
+warmup_iters:
+  desc: null
+  value: 1000
+lr_decay_iters:
+  desc: null
+  value: 300000
+min_lr:
+  desc: null
+  value: 3.0e-05
+backend:
+  desc: null
+  value: nccl
+device:
+  desc: null
+  value: cuda:1
+dtype:
+  desc: null
+  value: bfloat16
+compile:
+  desc: null
+  value: false
+early_stopping_patience:
+  desc: null
+  value: 5
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.9
+    cli_version: 0.17.7
+    framework: huggingface
+    huggingface_version: 4.27.4
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1737675729
+    t:
+      1:
+      - 1
+      - 11
+      - 49
+      - 53
+      - 55
+      2:
+      - 1
+      - 11
+      - 49
+      - 53
+      - 55
+      3:
+      - 13
+      - 16
+      - 23
+      4: 3.11.9
+      5: 0.17.7
+      6: 4.27.4
+      8:
+      - 5
+      13: linux-x86_64

@@ -1,0 +1,12 @@
+dokładnie te same teksty
+proporcja słów do tokenów
+lepsze tokeny - fleksyjne bogactwo
+
+AI:
+1. (prych) - bogatszy zbiór tagów
+tiktoken - specjalne tokeny
+dodać specjalne tokeny do herbverta
+może zadziała rozszerzenie aktualnego tokenizatora -> jest taka funkcja
+2. Trenować na dokładnie tylu samu słowach - same batch size in NL words
+3. specjalne tagi - jeżeli nie istnieje to weź ostatnie trzy litery
+4. rozważyć czy model ma przewidywać jedynie NL czy również notatki

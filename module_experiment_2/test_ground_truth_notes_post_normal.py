@@ -29,11 +29,11 @@ POS_CHARS = {
 ###############################################################################
 # 2. Set up directories and CSV for results
 ###############################################################################
-models_dir = os.path.join(os.getcwd(), 'models', 'pl')
+models_dir = os.path.join(os.getcwd(), 'models', 'pl_v4')
 names = [name for name in os.listdir(models_dir) if 'normal' in name and name.endswith('.pt')]
 dataset = 'lalka_prus_normal'
 data_dir = os.path.join(os.getcwd(), 'module_experiment_2')
-out_dir = os.path.join(os.getcwd(), 'reports', 'experiment_2')
+out_dir = os.path.join(os.getcwd(), 'reports', 'experiment_2_v4')
 os.makedirs(out_dir, exist_ok=True)
 
 results_csv = os.path.join(out_dir, "results_ground_post_normal.csv")
